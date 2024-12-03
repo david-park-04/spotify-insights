@@ -7,6 +7,8 @@
 import requests
 import jsons
 
+import sys
+
 # ----------
 # Prompt
 # ----------
@@ -43,4 +45,9 @@ def prompt():
 # Main
 # ----------
 print("** Welcome to Spotify Insights! **\n")
+
+# Eliminating traceback for just error message
+sys.tracebacklimit = 0
+
+
 
