@@ -1,2 +1,2 @@
-A summary of how to run the Spotify Insights application.
+How to run the Spotify Insights application.
 

@@ -10,6 +10,42 @@ import jsons
 import sys
 
 # ----------
+# Login 
+# ----------
+def login(baseurl):
+    pass
+
+# ----------
+# Start
+# ----------
+def start():
+    """
+    Starting display for the application.
+    
+    Parameters
+    ----------
+    None
+    
+    Returns
+    -------
+    Command number
+    """
+    
+    try: 
+        print()
+        print(">> Get started:")
+        print("   0 => end")
+        print("   1 => login")
+        
+        cmd = int(input())
+        
+        return cmd
+        
+    except Exception as e:
+        print("ERROR: Invalid input")
+        return -1
+
+# ----------
 # Prompt
 # ----------
 def prompt():
@@ -49,5 +85,18 @@ print("** Welcome to Spotify Insights! **\n")
 # Eliminating traceback for just error message
 sys.tracebacklimit = 0
 
+#
+# Starting processing loop
+#
+baseurl = "http://localhost:8080/"
 
+start_cmd = start()
 
+while start_cmd != 0:
+    
+  if start_cmd == 1:
+    login(baseurl)
+  else:
+    print("** Unknown command, try again... **")
+  
+  start_cmd = start()
