@@ -28,7 +28,6 @@ const spotify_db = require('./spotify_db.js');
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const REDIRECT_URI = process.env.REDIRECT_URI;
-const PORT = 8080;
 
 // -----------
 // Main
@@ -43,6 +42,22 @@ app.listen(config.service_port, () => {
 // Login
 // ----------
 app.get('/login', (req, res) => {
-    let scope = '';
-    let auth_url = '';
+    let scope = 'user-top-read playlist-modify-public';
+    
+    res.redirect('https://accounts.spotify.com/authorize?' + 
+        querystring.stringify({
+            response_type: 'code',
+            client_id: CLIENT_ID,
+            scope: scope,
+            redirect_uri: REDIRECT_URI
+        }));
 });
+
+// ----------
+// Callback
+// ----------
+
+
+// ----------
+// Refresh
+// ----------
