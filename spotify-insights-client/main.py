@@ -11,13 +11,23 @@ import jsons
 
 import sys
 import logging
-import time
+import webbrowser
 
 # ----------
 # Login 
 # ----------
 def login(baseurl):
     """
+    Login necessary for application to gain authorization
+    to user's Spotify.
+    
+    Parameters
+    ----------
+    baseurl: baseurl for web service
+    
+    Returns
+    -------
+    Nothing
     """
     
     try:
@@ -33,7 +43,17 @@ def login(baseurl):
             print("url: " + url)
             
             return
-    
+        
+        # 
+        # Telling user to navigate to the authorization URL 
+        #
+        print()
+        print("Navigate to the following URL to grant necessary permissions: \n")
+        print(res.url)
+        print()
+        
+        print("After authorization, the application will continue.")
+        
     except Exception as e:
         print("** ERROR **")
         logging.error("login() failed:")
@@ -111,20 +131,17 @@ print("** Welcome to Spotify Insights! **\n")
 sys.tracebacklimit = 0
 
 #
-# Starting processing loop
+# Prompting
 #
 baseurl = "http://localhost:8080"
 
 start_cmd = start()
 
-while start_cmd != 0:
-    
-  if start_cmd == 1:
-    login(baseurl)
-  else:
-    print("** Unknown command, try again... **")
+if start_cmd == 0:
+  print("** Ending application... **")
+elif start_cmd == 1:
+  login(baseurl)
   
-  start_cmd = start()
+else:
+  print("** Unknown command, try again... **")
   
-print()
-print('** Done **')

@@ -64,14 +64,14 @@ app.get('/login', (req, res) => {
 // Callback
 // ----------
 app.get("/callback", async (req, res) => {
-    const code = req.query.code || null;
+    let code = req.query.code || null;
 
     if (!code) {
         return res.status(400).send("Authorization code not found.");
     }
 
     try {
-        const tokenResponse = await axios.post(
+        let tokenResponse = await axios.post(
             "https://accounts.spotify.com/api/token",
             querystring.stringify({
                 code: code,
@@ -95,7 +95,8 @@ app.get("/callback", async (req, res) => {
             refresh_token,
             expires_in,
         });
-    } catch (error) {
+    } 
+    catch (error) {
         res.status(500).send("Error retrieving access token: " + error.message);
     }
 });
