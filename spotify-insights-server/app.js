@@ -44,22 +44,96 @@ app.listen(config.service_port, () => {
 // Login
 // ----------
 app.get('/login', (req, res) => {
-    let scope = 'user-top-read playlist-modify-public';
+    try {
+        let scope = 'user-top-read playlist-modify-public';
     
-    res.redirect('https://accounts.spotify.com/authorize?' + 
-        querystring.stringify({
-            response_type: 'code',
-            client_id: CLIENT_ID,
-            scope: scope,
-            redirect_uri: REDIRECT_URI
-        }));
+        res.redirect('https://accounts.spotify.com/authorize?' + 
+            querystring.stringify({
+                response_type: 'code',
+                client_id: CLIENT_ID,
+                scope: scope,
+                redirect_uri: REDIRECT_URI
+            }));
+    }
+    catch(err) {
+        res.status(500).send('** Error in /login:' + err.message + ' **');
+    }
 });
 
 // ----------
 // Callback
 // ----------
+app.get("/callback", async (req, res) => {
+    const code = req.query.code || null;
 
+    if (!code) {
+        return res.status(400).send("Authorization code not found.");
+    }
+
+    try {
+        const tokenResponse = await axios.post(
+            "https://accounts.spotify.com/api/token",
+            querystring.stringify({
+                code: code,
+                redirect_uri: REDIRECT_URI,
+                grant_type: "authorization_code",
+            }),
+            {
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    Authorization:
+                        "Basic " +
+                        Buffer.from(CLIENT_ID + ":" + CLIENT_SECRET).toString("base64"),
+                },
+            }
+        );
+
+        const { access_token, refresh_token, expires_in } = tokenResponse.data;
+
+        res.json({
+            access_token,
+            refresh_token,
+            expires_in,
+        });
+    } catch (error) {
+        res.status(500).send("Error retrieving access token: " + error.message);
+    }
+});
 
 // ----------
-// Refresh
+// Refresh token
 // ----------
+app.get("/refresh_token", async (req, res) => {
+    const refreshToken = req.query.refresh_token;
+
+    if (!refreshToken) {
+        return res.status(400).send("Refresh token is missing.");
+    }
+
+    try {
+        const refreshResponse = await axios.post(
+            "https://accounts.spotify.com/api/token",
+            querystring.stringify({
+                grant_type: "refresh_token",
+                refresh_token: refreshToken,
+            }),
+            {
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    Authorization:
+                        "Basic " +
+                        Buffer.from(CLIENT_ID + ":" + CLIENT_SECRET).toString("base64"),
+                },
+            }
+        );
+
+        const { access_token, expires_in } = refreshResponse.data;
+
+        res.json({
+            access_token,
+            expires_in,
+        });
+    } catch (error) {
+        res.status(500).send("Error refreshing token: " + error.message);
+    }
+});

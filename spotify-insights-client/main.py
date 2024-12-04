@@ -21,7 +21,7 @@ def login(baseurl):
     """
     
     try:
-        api = "login/"
+        api = "/login"
     
         url = baseurl + api
         
@@ -113,7 +113,7 @@ sys.tracebacklimit = 0
 #
 # Starting processing loop
 #
-baseurl = "http://localhost:8080/"
+baseurl = "http://localhost:8080"
 
 start_cmd = start()
 
