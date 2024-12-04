@@ -179,3 +179,6 @@ while start_cmd != 0:
     print("** Unknown command, try again... **")
   
   start_cmd = start()
+  
+print()
+print('** Done **')

@@ -1,6 +1,3 @@
-//
-// Request coming in from the client
-//
 exports.get_login = async(req, res) => {
     
     console.log("** Call to get /login url...");
