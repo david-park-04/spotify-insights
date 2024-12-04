@@ -1,0 +1,15 @@
+{
+    "name": "spotify-insights-server-app",
+    "version": "1.0.0",
+    "description": "Server-side for Spotify Insights.",
+    "main": "app.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "node app.js"
+    },
+    "author": "David Park",
+    "license": "ISC",
+    "dependencies": {
+        "express": "^4.21.0"
+    }
+}
