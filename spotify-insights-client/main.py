@@ -52,14 +52,15 @@ def login(baseurl):
         print(res.url)
         print()
         
-        print("After authorization, the application will continue.")
+        print("Authorize before proceeding...")
+        print()
         
     except Exception as e:
         print("** ERROR **")
         logging.error("login() failed:")
         logging.error("url: " + url)
         logging.error(e)
-    
+        
 # ----------
 # Start
 # ----------
@@ -131,16 +132,39 @@ print("** Welcome to Spotify Insights! **\n")
 sys.tracebacklimit = 0
 
 #
-# Prompting
+# Initial prompt
 #
 baseurl = "http://localhost:8080"
 
 start_cmd = start()
 
 if start_cmd == 0:
-  print("** Ending application... **")
+    print("** Ending application... **")
 elif start_cmd == 1:
-  login(baseurl)
+    login(baseurl)
 else:
-  print("** Unknown command, try again... **")
+    print("** Unknown command, try again... **")
+
+#
+# Main processing loop
+#
+cmd = prompt()
+
+while cmd != 0:
+    #
+    if cmd == 1:
+        pass
+    elif cmd == 2:
+        pass
+    elif cmd == 3:
+        pass
+    else:
+        print("** Unknown command, try again... **")
   
+    cmd = prompt()
+
+#
+# Done
+#
+print()
+print('** Done **')

@@ -75,27 +75,27 @@ app.get('/login', (req, res) => {
 // ----------
 // Callback
 // ----------
-app.get("/callback", async (req, res) => {
+app.get('/callback', async (req, res) => {
     let code = req.query.code || null;
 
     if (!code) {
-        return res.status(400).send("Authorization code not found.");
+        return res.status(400).send('Authorization code not found.');
     }
 
     try {
         let tokenResponse = await axios.post(
-            "https://accounts.spotify.com/api/token",
+            'https://accounts.spotify.com/api/token',
             querystring.stringify({
                 code: code,
                 redirect_uri: REDIRECT_URI,
-                grant_type: "authorization_code",
+                grant_type: 'authorization_code',
             }),
             {
                 headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
+                    'Content-Type': 'application/x-www-form-urlencoded',
                     Authorization:
-                        "Basic " +
-                        Buffer.from(CLIENT_ID + ":" + CLIENT_SECRET).toString("base64"),
+                        'Basic ' +
+                        Buffer.from(CLIENT_ID + ':' + CLIENT_SECRET).toString('base64'),
                 },
             }
         );
@@ -116,33 +116,33 @@ app.get("/callback", async (req, res) => {
         });
     } 
     catch (error) {
-        res.status(500).send("Error retrieving access token: " + error.message);
+        res.status(500).send('Error retrieving access token: ' + error.message);
     }
 });
 
 // ----------
 // Refresh token
 // ----------
-app.get("/refresh_token", async (req, res) => {
-    const refreshToken = req.query.refresh_token;
+app.get('/refresh_token', async (req, res) => {
+    let refreshToken = req.query.refresh_token;
 
     if (!refreshToken) {
-        return res.status(400).send("Refresh token is missing.");
+        return res.status(400).send('Refresh token is missing.');
     }
 
     try {
         const refreshResponse = await axios.post(
             "https://accounts.spotify.com/api/token",
             querystring.stringify({
-                grant_type: "refresh_token",
+                grant_type: 'refresh_token',
                 refresh_token: refreshToken,
             }),
             {
                 headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
+                    'Content-Type': 'application/x-www-form-urlencoded',
                     Authorization:
-                        "Basic " +
-                        Buffer.from(CLIENT_ID + ":" + CLIENT_SECRET).toString("base64"),
+                        'Basic ' +
+                        Buffer.from(CLIENT_ID + ':' + CLIENT_SECRET).toString('base64'),
                 },
             }
         );
@@ -154,6 +154,7 @@ app.get("/refresh_token", async (req, res) => {
             expires_in,
         });
     } catch (error) {
-        res.status(500).send("Error refreshing token: " + error.message);
+        res.status(500).send('Error refreshing token: ' + error.message);
     }
 });
+  
