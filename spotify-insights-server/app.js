@@ -53,6 +53,44 @@ app.listen(config.service_port, () => {
 });
 
 // ----------
+// Genre Insights - Calculates genre frequencies for a user's top tracks
+// ----------
+app.get('/genre', async (req, res) => {
+    try {
+        // Checking access token availability
+        let tokens = res.session.tokens;
+        let access_token = tokens.accessToken;
+        if(!access_token) {
+            res.status_code(400).send('Unauthorized. Log in necessary.');
+            return;
+        }
+
+        let topTracksResponse = await axios.get('https://api.spotify.com/v1/me/top/tracks?limit=50&offset=0', {
+            headers: { Authorization: `Bearer ${access_token}`}
+        });
+
+        
+    }
+    catch(err) {
+        res.status(500).send('Error in /genre: ' + err.message + ' **');
+    }
+});
+
+// ----------
+// Time Insights - Calculates the total time listening to Spotify for different periods of the day
+// ----------
+app.get('/time', (req, res) => {
+
+});
+
+// ----------
+// Artist Insights - Most played artist by month
+// ----------
+app.get('/artist', (req, res) => {
+
+});
+
+// ----------
 // Login
 // ----------
 app.get('/login', (req, res) => {
@@ -68,7 +106,7 @@ app.get('/login', (req, res) => {
             }));
     }
     catch(err) {
-        res.status(500).send('** Error in /login:' + err.message + ' **');
+        res.status(500).send('** Error in /login: ' + err.message + ' **');
     }
 });
 
@@ -107,7 +145,7 @@ app.get('/callback', async (req, res) => {
             refreshToken: refresh_token,
             expiresIn: expires_in,
             acquiredAt: Date.now(),
-          };
+        };
 
         res.json({
             access_token,
@@ -115,8 +153,8 @@ app.get('/callback', async (req, res) => {
             expires_in,
         });
     } 
-    catch (error) {
-        res.status(500).send('Error retrieving access token: ' + error.message);
+    catch (err) {
+        res.status(500).send('Error retrieving access token: ' + err.message);
     }
 });
 
@@ -153,8 +191,8 @@ app.get('/refresh_token', async (req, res) => {
             access_token,
             expires_in,
         });
-    } catch (error) {
-        res.status(500).send('Error refreshing token: ' + error.message);
+    } catch (err) {
+        res.status(500).send('Error refreshing token: ' + err.message);
     }
 });
   
