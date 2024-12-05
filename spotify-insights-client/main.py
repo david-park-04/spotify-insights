@@ -141,7 +141,6 @@ if start_cmd == 0:
   print("** Ending application... **")
 elif start_cmd == 1:
   login(baseurl)
-  
 else:
   print("** Unknown command, try again... **")
   
