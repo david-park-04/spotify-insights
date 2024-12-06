@@ -18,3 +18,4 @@ node app.js
 exit
 node app.js
 exit
+node app.js

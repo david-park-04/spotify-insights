@@ -19,18 +19,6 @@ const querystring = require('querystring');
 const dotenv = require('dotenv');
 dotenv.config();
 
-// For express session
-const session = require('express-session');
-
-app.use(
-    session({
-      secret: process.env.SESSION_SECRET,
-      resave: false,
-      saveUninitialized: true,
-      cookie: { secure: false },
-    })
-);
-
 const config = require('./config.js');
 const spotify_db = require('./spotify_db.js');
 
@@ -121,6 +109,9 @@ app.get('/callback', async (req, res) => {
     }
 
     try {
+        // 
+        // Retrieving tokens (given authorization)
+        //
         let tokenResponse = await axios.post(
             'https://accounts.spotify.com/api/token',
             querystring.stringify({
@@ -138,14 +129,12 @@ app.get('/callback', async (req, res) => {
             }
         );
 
-        const { access_token, refresh_token, expires_in } = tokenResponse.data;
+        let { access_token, refresh_token, expires_in } = tokenResponse.data;
 
-        req.session.tokens = {
-            accessToken: access_token,
-            refreshToken: refresh_token,
-            expiresIn: expires_in,
-            acquiredAt: Date.now(),
-        };
+        //
+        // Store tokens in AWS RDS database
+        //
+        
 
         res.json({
             access_token,
