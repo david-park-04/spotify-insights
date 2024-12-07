@@ -102,9 +102,91 @@ def genre(baseurl):
     
     except Exception as e:
         print("** ERROR **")
-        logging.error("login() failed:")
+        logging.error("genre() failed:")
         logging.error("url: " + url)
-        logging.error(e)       
+        logging.error(e)   
+        
+# ----------
+# Favorite Artist
+# ----------
+def favorite_artist(baseurl):
+    """
+    Retrieves your favorite artist based on frequency in top tracks.
+    
+    Parameters
+    ----------
+    baseurl: baseurl for web service
+    
+    Returns 
+    -------
+    Nothing
+    """    
+    
+    try:
+        api = "/favorite_artist"
+        
+        url = baseurl + api
+        
+        res = requests.get(url)
+        
+        # Not a success
+        if res.status_code != 200:
+            print("Failed with status code:", res.status_code)
+            print("url: " + url)
+            
+            return
+        
+        # Success, get favorite artist
+        body = res.json()
+        
+        artist = body["data"][0];
+        frequency = body["data"][1];
+        
+        print()
+        print(f"Based on your top 50 songs, your favorite artist is... {artist}!")
+        print(f"Appeared a total of {frequency} times!\n")
+    
+    except Exception as e:
+        print("** ERROR **")
+        logging.error("favorite_artist() failed:")
+        logging.error("url: " + url)
+        logging.error(e)   
+        
+# ----------
+# 
+# ----------
+def func1(baseurl):
+    """
+    Description.
+    
+    Parameters
+    ----------
+    baseurl: baseurl for web service
+    
+    Returns 
+    -------
+    Nothing
+    """    
+    
+    try:
+        api = "/"
+        
+        url = baseurl + api
+        
+        res = requests.get(url)
+        
+        # Not a success
+        if res.status_code != 200:
+            print("Failed with status code:", res.status_code)
+            print("url: " + url)
+            
+            return
+        
+    except Exception as e:
+        print("** ERROR **")
+        logging.error("func() failed:")
+        logging.error("url: " + url)
+        logging.error(e) 
         
 # ----------
 # Start
@@ -157,7 +239,7 @@ def prompt():
         print(">> Enter a command:")
         print("   0 => end")
         print("   1 => calculate genres of top tracks")
-        print("   2 => command 2")
+        print("   2 => calculate favorite artist (based on frequency in top tracks)")
         print("   3 => command 3")
         
         cmd = int(input())
@@ -200,7 +282,7 @@ while cmd != 0:
     if cmd == 1:
         genre(baseurl)
     elif cmd == 2:
-        pass
+        favorite_artist(baseurl)
     elif cmd == 3:
         pass
     else:

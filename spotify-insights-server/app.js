@@ -49,8 +49,6 @@ app.get('/genre', async (req, res) => {
         let sql = `select access_token from tokens where user_id = ?`;
         let param = [global.id];
 
-        console.log(param);
-
         spotify_db.query(sql, param, async (err, row) => {
             if (err) {
                 res.status(500).json({"message" : err.message, "data" : [] });
@@ -120,17 +118,98 @@ app.get('/genre', async (req, res) => {
 });
 
 // ----------
-// Time Insights - Calculates the total time listening to Spotify for different periods of the day
+// Favorite Artist
 // ----------
-app.get('/time', (req, res) => {
-    
+app.get('/favorite_artist', (req, res) => {
+    try {
+        let sql = `select access_token from tokens where user_id = ?`;
+        let param = [global.id];
+
+        spotify_db.query(sql, param, async (err, row) => {
+            if (err) {
+                res.status(500).json({"message" : err.message, "data" : [] });
+                return;
+            }
+
+            // Get the row possessing the access token
+            if (row.length == 0) {
+                res.status(400).json({"message" : "Access token is not available. Authorization required.", "data" : []});
+                return;
+            }
+
+            let access_token = row[0].access_token;
+
+            // Get top tracks from Spotify
+            let topTracksResponse = await axios.get('https://api.spotify.com/v1/me/top/tracks?limit=50&offset=0', {
+                headers: { Authorization: `Bearer ${access_token}`}
+            });
+
+            //
+            // Analyze favorite artist based on top tracks
+            //
+            let top_tracks = topTracksResponse.data.items;
+
+            // Utilizing a map to hold key-value pairs (artist to frequency)
+            let artist_freq = new Map();
+
+            // Loop through top tracks
+            for (let track of top_tracks) {
+                // Loop through artists
+                for (let artist of track.artists) {
+                    if (artist_freq.has(artist.name)) {
+                        artist_freq.set(artist.name, artist_freq.get(artist.name) + 1);
+                    }
+                    else {
+                        artist_freq.set(artist.name, 1);
+                    }
+                }
+            }
+
+            console.log(artist_freq);
+
+            // Finding top artist
+            let top_artist = '';
+            let top_frequency = 0;
+            for (let [artist, frequency] of artist_freq) {
+                if (frequency > top_frequency) {
+                    top_frequency = frequency;
+                    top_artist = artist;
+                }
+            }
+
+            console.log('Sending response');
+            res.json({"message" : "success", "data" : [top_artist, top_frequency]});
+        });
+    }
+
+    catch(err) {
+        res.status(500).send('Error in /favorite_artist: ' + err.message + ' **');
+    }
 });
 
 // ----------
-// Artist Insights - Most played artist by month
+// 
 // ----------
-app.get('/artist', (req, res) => {
+app.get('/', (req, res) => {
+    let sql = `select access_token from tokens where user_id = ?`;
+    let param = [global.id];
 
+    spotify_db.query(sql, param, (req, res) => {
+        if (err) {
+            res.status(500).json({"message" : err.message, "data" : [] });
+            return;
+        }
+
+        // Get the row possessing the access token
+        if (row.length == 0) {
+            res.status(400).json({"message" : "Access token is not available. Authorization required.", "data" : []});
+            return;
+        }
+
+        let access_token = row[0].access_token;
+
+
+    });
 });
 
 // ----------
