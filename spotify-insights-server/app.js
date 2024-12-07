@@ -45,20 +45,72 @@ app.listen(config.service_port, () => {
 // ----------
 app.get('/genre', async (req, res) => {
     try {
-        // Checking access token availability
-        let tokens = res.session.tokens;
-        let access_token = tokens.accessToken;
-        if(!access_token) {
-            res.status_code(400).send('Unauthorized. Log in necessary.');
-            return;
-        }
+        // Retrieving access token
+        let sql = `select access_token where user_id = ?`;
+        let param = [global.id];
 
-        let topTracksResponse = await axios.get('https://api.spotify.com/v1/me/top/tracks?limit=50&offset=0', {
-            headers: { Authorization: `Bearer ${access_token}`}
+        spotify_db.query(sql, param, async (err, row) => {
+            if (err) {
+                res.status(500).json({"message" : err.message, "data" : [] });
+                return;
+            }
+
+            // Get the row possessing the access token
+            if (res.length == 0) {
+                res.status(400).json({"message" : "Access token is not available. Authorization required.", "data" : []});
+                return;
+            }
+
+            let access_token = row[0].access_token;
+
+            // Get top tracks from Spotify
+            let topTracksResponse = await axios.get('https://api.spotify.com/v1/me/top/tracks?limit=50&offset=0', {
+                headers: { Authorization: `Bearer ${access_token}`}
+            });
+
+            // Parse top tracks response to begin analysis of genre frequencies
+            let top_tracks = topTracksResponse.data.items;
+
+            //
+            // Analyze genre frequencies
+            //
+            
+            // Utilizing a map to hold key-value pairs (genre to frequency)
+            let genre_freq = new Map();
+            
+            // Loop through top tracks
+            for (let track of top_tracks) {
+                // Loop through artists to get genres of the tracks
+                for (let artist of track.artists) {
+                    // Get the 
+                    const artistResponse = await axios.get(
+                        `https://api.spotify.com/v1/artists/${artist.id}`,
+                        {
+                            headers: {
+                            Authorization: `Bearer ${accessToken}`,
+                            },
+                    });
+
+                    // Using artist of track to get genre(s)
+                    let genres = artistResponse.data.genres;
+                    for (let genre of genres) {
+                        if (genre_freq.has(genre)) {
+                            genre_freq.set(genre, genre_freq.get(genre) + 1);
+                        }
+                        else {
+                            genre_freq.set(genre, 1);
+                        }
+                    }
+
+                }
+            }
+
+            // Frequencies obtained at this point
+            console.log("Sending response");
+            res.json({"message" : "success", "data" : genre_freq});
         });
-
-        
     }
+
     catch(err) {
         res.status(500).send('Error in /genre: ' + err.message + ' **');
     }
@@ -112,7 +164,7 @@ app.get('/callback', async (req, res) => {
         // 
         // Retrieving tokens (given authorization)
         //
-        let tokenResponse = await axios.post(
+        const tokenResponse = await axios.post(
             'https://accounts.spotify.com/api/token',
             querystring.stringify({
                 code: code,
@@ -146,8 +198,8 @@ app.get('/callback', async (req, res) => {
                 res.status(500).json({"message" : err.message, "data" : [] });
             }
 
-            // Sending response
-            res.json({"message" : "inserted", "userid" : insert_result.insertId});
+            // User ID to retrieve token later on
+            global.id = insert_result.insertId;
         });
 
         res.json({
@@ -160,42 +212,3 @@ app.get('/callback', async (req, res) => {
         res.status(500).send('Error retrieving access token: ' + err.message);
     }
 });
-
-// ----------
-// Refresh token
-// ----------
-app.get('/refresh_token', async (req, res) => {
-    let refreshToken = req.query.refresh_token;
-
-    if (!refreshToken) {
-        return res.status(400).send('Refresh token is missing.');
-    }
-
-    try {
-        const refreshResponse = await axios.post(
-            "https://accounts.spotify.com/api/token",
-            querystring.stringify({
-                grant_type: 'refresh_token',
-                refresh_token: refreshToken,
-            }),
-            {
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    Authorization:
-                        'Basic ' +
-                        Buffer.from(CLIENT_ID + ':' + CLIENT_SECRET).toString('base64'),
-                },
-            }
-        );
-
-        const { access_token, expires_in } = refreshResponse.data;
-
-        res.json({
-            access_token,
-            expires_in,
-        });
-    } catch (err) {
-        res.status(500).send('Error refreshing token: ' + err.message);
-    }
-});
-  
