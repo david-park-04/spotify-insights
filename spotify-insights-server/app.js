@@ -188,9 +188,14 @@ app.get('/callback', async (req, res) => {
         //
         let expire_time = new Date(Date.now() + expires_in * 1000);
 
+        console.log(access_token, expire_time);
+
         let insert_sql = `insert into
                             tokens(access_token, expiration)
-                            value(?, ?);`;
+                            values(?, ?);`;
+
+        console.log(insert_sql);
+
         let insert_params = [access_token, expire_time];
 
         spotify_db.query(insert_sql, insert_params, (err, insert_result) => {

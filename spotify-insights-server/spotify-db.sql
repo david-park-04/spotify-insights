@@ -18,6 +18,10 @@ INSERT INTO
     tokens (access_token, expiration)
     values ('access_token_1', '2024-12-06 15:30:00');
 
+INSERT INTO 
+    tokens (access_token, expiration)
+    values ('access_token_2', '2024-12-06 15:30:00');
+
 -- SELECT * FROM tokens;
 
 DROP USER IF EXISTS 'spotify-read-only';
