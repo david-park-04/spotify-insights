@@ -18,9 +18,10 @@ INSERT INTO
     tokens (access_token, expiration)
     values ('access_token_1', '2024-12-06 15:30:00');
 
-INSERT INTO 
-    tokens (access_token, expiration)
-    values ('access_token_2', '2024-12-06 15:30:00');
+-- INSERT INTO 
+--     tokens (access_token, expiration)
+--     values ('BQAr8kujUZ4M3UiifeD6E0iFjfP6zDsQ6GUCzWN0h78QU3cHULhq9EWUH1AGSB13QYnmioWJHF8FEBB9ZzzRz1kBftzKimUVrfT2xsJnBcbKEWT89ebPM-JJXsIsBfkWKThGBU6pp3vz4HC4QclNL6iWPLxTC7-Ku4Br6t1SSzmvtgB-n74sEcN1gA-l1cOj83ah-rfiOWX-VaJqu3ypbyKpR2aFEHlTGmi1fG2PIY1g0RDJKlU',
+--   '2024-12-07T20:59:26.602Z');
 
 -- SELECT * FROM tokens;
 

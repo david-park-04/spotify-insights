@@ -78,3 +78,45 @@ python3 main.py
 exit
 python3 main.py
 exit
+python3 main.py
+./docker-run.bash
+python3 main.py
+exit
+python3 main.py
+clear
+exit
+python3 main.py
+clear
+exit
+python3 main.py
+exit
+python3 main.py
+exit
+python3 main.py
+exit
+python3 main.py
+exit
+python3 main.py
+exit
+python3 main.py
+exit
+python3 main.py
+exit
+python3 main.py
+exit
+python3 main.py
+exit
+python3 main.py
+exit
+python3 main.py
+clear
+exit
+python3 main.py
+clear
+exit
+python3 main.py
+exit
+python3 main.py
+exit
+python3 main.py
+exit

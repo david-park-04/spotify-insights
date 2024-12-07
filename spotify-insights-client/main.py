@@ -95,7 +95,9 @@ def genre(baseurl):
         # Success, get response and print out frequencies
         body = res.json()
         
-        genre_frequencies = body["data"]
+        print(body)
+        
+        genre_frequencies = body.get("genre_frequencies", {})
         for genre, frequency in genre_frequencies.items():
             print(f"{genre}: {frequency}")
     

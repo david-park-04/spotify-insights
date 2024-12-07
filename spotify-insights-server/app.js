@@ -46,8 +46,10 @@ app.listen(config.service_port, () => {
 app.get('/genre', async (req, res) => {
     try {
         // Retrieving access token
-        let sql = `select access_token where user_id = ?`;
+        let sql = `select access_token from tokens where user_id = ?`;
         let param = [global.id];
+
+        console.log(param);
 
         spotify_db.query(sql, param, async (err, row) => {
             if (err) {
@@ -56,7 +58,7 @@ app.get('/genre', async (req, res) => {
             }
 
             // Get the row possessing the access token
-            if (res.length == 0) {
+            if (row.length == 0) {
                 res.status(400).json({"message" : "Access token is not available. Authorization required.", "data" : []});
                 return;
             }
@@ -82,12 +84,11 @@ app.get('/genre', async (req, res) => {
             for (let track of top_tracks) {
                 // Loop through artists to get genres of the tracks
                 for (let artist of track.artists) {
-                    // Get the 
                     const artistResponse = await axios.get(
                         `https://api.spotify.com/v1/artists/${artist.id}`,
                         {
                             headers: {
-                            Authorization: `Bearer ${accessToken}`,
+                            Authorization: `Bearer ${access_token}`,
                             },
                     });
 
@@ -105,15 +106,51 @@ app.get('/genre', async (req, res) => {
                 }
             }
 
+            console.log(genre_freq);
             // Frequencies obtained at this point
             console.log("Sending response");
-            res.json({"message" : "success", "data" : genre_freq});
+            res.json({"message" : "success", "genre_frequencies" : genre_freq});
         });
     }
 
     catch(err) {
         res.status(500).send('Error in /genre: ' + err.message + ' **');
     }
+});
+
+app.get('/db_test', (req, res) => {
+    let select_sql = 'select * from tokens;';
+    let select_params = [];
+
+    spotify_db.query(select_sql, select_params, (err, row) => {
+        console.log(row);
+    })
+});
+
+app.get('/db_test_2', (req, res) => {
+    let insert_sql = `insert into
+    tokens(access_token, expiration)
+    values('BQCJOY_GPZXPF3ad3B1-8C2scOfZM-euVrKtuO2vYPEfTgTU68UUCuvKNDEvpez4a-Vmg3rO_4tf3RGeIigrO1BBHbhCPo9MB1NYzF19UNhdODmciQPd41BKdj4eT4ki1jX2ml0kCcytJSUgPnY3nlLeIrxZuX5P1Cn3NUu5PGM--ZtH_Am5ID1g7CGmPeHTRGG_yphjv4KrNw84n0a7TwpHBA-eRaLDA', '2024-12-06 15:30:00');`;
+
+    let insert_params = [];
+
+    spotify_db.query(insert_sql, insert_params, (err, insert_result) => {
+        console.log(insert_result);
+    });
+});
+
+app.get('/db_test_3', (req, res) => {
+    let insert_sql = `insert into
+    tokens(access_token, expiration)
+    values(?, '2024-12-06 15:30:00');`;
+
+    let access_token = 'BQCJOY_GPZXPF3ad3B1-8C2scOfZM-euVrKtuO2vYPEfTgTU68UUCuvKNDEvpez4a-Vmg3rO_4tf3RGeIigrO1BBHbhCPo9MB1NYzF19UNhdODmciQPd41BKdj4eT4ki1jX2ml0kCcytJSUgPnY3nlLeIrxZuX5P1Cn3NUu5PGM--ZtH_Am5ID1g7CGmPeHTRGG_yphjv4KrNw84n0a7TwpHBA-eRaLDA';
+
+    let insert_param = [access_token];
+
+    spotify_db.query(insert_sql, insert_param, (err, insert_result) => {
+        console.log(insert_result);
+    });
 });
 
 // ----------
@@ -188,13 +225,9 @@ app.get('/callback', async (req, res) => {
         //
         let expire_time = new Date(Date.now() + expires_in * 1000);
 
-        console.log(access_token, expire_time);
-
         let insert_sql = `insert into
                             tokens(access_token, expiration)
                             values(?, ?);`;
-
-        console.log(insert_sql);
 
         let insert_params = [access_token, expire_time];
 
