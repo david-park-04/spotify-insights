@@ -134,7 +134,21 @@ app.get('/callback', async (req, res) => {
         //
         // Store tokens in AWS RDS database
         //
-        
+        let expire_time = new Date(Date.now() + expires_in * 1000);
+
+        let insert_sql = `insert into
+                            tokens(access_token, expiration)
+                            value(?, ?);`;
+        let insert_params = [access_token, expire_time];
+
+        spotify_db.query(insert_sql, insert_params, (err, insert_result) => {
+            if (err) {
+                res.status(500).json({"message" : err.message, "data" : [] });
+            }
+
+            // Sending response
+            res.json({"message" : "inserted", "userid" : insert_result.insertId});
+        });
 
         res.json({
             access_token,
