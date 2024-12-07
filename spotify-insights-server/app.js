@@ -106,10 +106,11 @@ app.get('/genre', async (req, res) => {
                 }
             }
 
-            console.log(genre_freq);
             // Frequencies obtained at this point
             console.log("Sending response");
-            res.json({"message" : "success", "genre_frequencies" : genre_freq});
+
+            let genre_freq_object = Object.fromEntries(genre_freq);
+            res.json({"message" : "success", "genre_frequencies" : genre_freq_object});
         });
     }
 
@@ -118,46 +119,11 @@ app.get('/genre', async (req, res) => {
     }
 });
 
-app.get('/db_test', (req, res) => {
-    let select_sql = 'select * from tokens;';
-    let select_params = [];
-
-    spotify_db.query(select_sql, select_params, (err, row) => {
-        console.log(row);
-    })
-});
-
-app.get('/db_test_2', (req, res) => {
-    let insert_sql = `insert into
-    tokens(access_token, expiration)
-    values('BQCJOY_GPZXPF3ad3B1-8C2scOfZM-euVrKtuO2vYPEfTgTU68UUCuvKNDEvpez4a-Vmg3rO_4tf3RGeIigrO1BBHbhCPo9MB1NYzF19UNhdODmciQPd41BKdj4eT4ki1jX2ml0kCcytJSUgPnY3nlLeIrxZuX5P1Cn3NUu5PGM--ZtH_Am5ID1g7CGmPeHTRGG_yphjv4KrNw84n0a7TwpHBA-eRaLDA', '2024-12-06 15:30:00');`;
-
-    let insert_params = [];
-
-    spotify_db.query(insert_sql, insert_params, (err, insert_result) => {
-        console.log(insert_result);
-    });
-});
-
-app.get('/db_test_3', (req, res) => {
-    let insert_sql = `insert into
-    tokens(access_token, expiration)
-    values(?, '2024-12-06 15:30:00');`;
-
-    let access_token = 'BQCJOY_GPZXPF3ad3B1-8C2scOfZM-euVrKtuO2vYPEfTgTU68UUCuvKNDEvpez4a-Vmg3rO_4tf3RGeIigrO1BBHbhCPo9MB1NYzF19UNhdODmciQPd41BKdj4eT4ki1jX2ml0kCcytJSUgPnY3nlLeIrxZuX5P1Cn3NUu5PGM--ZtH_Am5ID1g7CGmPeHTRGG_yphjv4KrNw84n0a7TwpHBA-eRaLDA';
-
-    let insert_param = [access_token];
-
-    spotify_db.query(insert_sql, insert_param, (err, insert_result) => {
-        console.log(insert_result);
-    });
-});
-
 // ----------
 // Time Insights - Calculates the total time listening to Spotify for different periods of the day
 // ----------
 app.get('/time', (req, res) => {
-
+    
 });
 
 // ----------
