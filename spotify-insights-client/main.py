@@ -62,6 +62,50 @@ def login(baseurl):
         logging.error(e)
         
 # ----------
+# Genre
+# ----------
+def genre(baseurl):
+    """
+    Find the frequencies of genres for your top tracks.
+    
+    Parameters
+    ----------
+    baseurl: baseurl for web service
+    
+    Returns 
+    -------
+    Nothing
+    """
+    
+    try:
+        
+        api = "/genre"
+        
+        url = baseurl + api
+        
+        res = requests.get(url)
+        
+        # Not a success
+        if res.status_code != 200:
+            print("Failed with status code:", res.status_code)
+            print("url: " + url)
+            
+            return
+        
+        # Success, get response and print out frequencies
+        body = res.json()
+        
+        genre_frequencies = body["data"]
+        for genre, frequency in genre_frequencies.items():
+            print(f"{genre}: {frequency}")
+    
+    except Exception as e:
+        print("** ERROR **")
+        logging.error("login() failed:")
+        logging.error("url: " + url)
+        logging.error(e)       
+        
+# ----------
 # Start
 # ----------
 def start():
@@ -111,7 +155,7 @@ def prompt():
         print()
         print(">> Enter a command:")
         print("   0 => end")
-        print("   1 => command 1")
+        print("   1 => calculate genres of top tracks")
         print("   2 => command 2")
         print("   3 => command 3")
         
@@ -153,7 +197,7 @@ cmd = prompt()
 while cmd != 0:
     #
     if cmd == 1:
-        pass
+        genre(baseurl)
     elif cmd == 2:
         pass
     elif cmd == 3:
