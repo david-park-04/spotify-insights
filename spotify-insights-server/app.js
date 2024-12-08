@@ -193,24 +193,34 @@ app.get('/favorite_artist', (req, res) => {
 // ----------
 // Create Artist Playlist
 // ----------
-app.get('/artist_playlist', (req, res) => {
+app.get('/discover_artist', (req, res) => {
     let sql = `select access_token from tokens where user_id = ?`;
     let param = [global.id];
 
-    spotify_db.query(sql, param, async (err, res) => {
+    console.log(global.id);
+
+    console.log(sql);
+
+    spotify_db.query(sql, param, async (err, row) => {
         try {
+            console.log(sql, '1');
             if (err) {
                 res.status(500).json({"message" : err.message, "data" : [] });
                 return;
             }
     
+            console.log("Checkpoint 1");
             // Get the row possessing the access token
             if (row.length == 0) {
                 res.status(400).json({"message" : "Access token is not available. Authorization required.", "data" : []});
                 return;
             }
+
+            console.log("checkpoint 2");
     
             let access_token = row[0].access_token;
+
+            console.log("checkpoint 3");
     
             // Get top tracks from Spotify
             let topTracksResponse = await axios.get('https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=50&offset=0', {
@@ -218,6 +228,10 @@ app.get('/artist_playlist', (req, res) => {
             });
 
             let top_tracks = topTracksResponse.data.items;
+
+            console.log(access_token);
+
+            console.log(top_tracks);
 
             // Utilizing a map to hold key-value pairs (artist to frequency)
             let artist_freq = new Map();
@@ -235,15 +249,19 @@ app.get('/artist_playlist', (req, res) => {
                 }
             }
 
+            console.log('Artist freq: ', artist_freq);
+
             // Find minimum occurring artist
             let new_artist = '';
-            let top_frequency = 1000;
+            let min_frequency = 1000;
             for (let [artist, frequency] of artist_freq) {
-                if (frequency < top_frequency) {
+                if (frequency < min_frequency) {
                     new_artist = artist;
-                    top_frequency = frequency;
+                    min_frequency = frequency;
                 }
             }
+
+            console.log('Min frequency: ', min_frequency);
 
             //
             // Create a playlist filled with songs of the artist you may like
@@ -255,6 +273,8 @@ app.get('/artist_playlist', (req, res) => {
             });
 
             let spotify_id = spotifyIDResponse.data.id;
+
+            console.log('Spotify ID: ', spotify_id);
 
             // Create playlist
             let describe = {
@@ -270,25 +290,45 @@ app.get('/artist_playlist', (req, res) => {
 
             let playlist_id = artistPlaylistResponse.data.id;
 
+            console.log('Playlist ID: ', playlist_id);
+
             // Retrieve Spotify ID of artist
             let encoded_artist = encodeURIComponent(new_artist);
+            
+            console.log(encoded_artist);
 
             let search_url = `https://api.spotify.com/v1/search?q=${encoded_artist}&type=artist&limit=1`;
+            
+            console.log(search_url);
 
             let artistIDResponse = await axios.get(search_url, {
                 headers : { Authorization : `Bearer ${access_token}`}
             });
             
-            let artist_id = artistIDResponse.data.items[0].id;
+            console.log("checkpoint 4");
+            console.log(artistIDResponse.data.artists.items);
+
+            let artist_id = artistIDResponse.data.artists.items[0].id;
+
+            console.log(artist_id);
+
+            // 
+            //
 
             // Retrieve top tracks of artist
             let top_songs_artist_url = `https://api.spotify.com/v1/artists/${artist_id}/top-tracks`;
 
+            console.log(top_songs_artist_url);
+
             let topSongsResponse = await axios.get(top_songs_artist_url, {
-                header : { Authorization : `Bearer ${access_token}`}
+                headers : { Authorization : `Bearer ${access_token}`}
             });
 
+            console.log(topSongsResponse);
+
             let top_artist_songs_uris = topSongsResponse.data.tracks.map(track => track.uri);
+
+            console.log(top_artist_songs_uris);
 
             // Add songs to created playlist
             let add_url = `https://api.spotify.com/v1/playlists/${playlist_id}/tracks`;
@@ -299,10 +339,11 @@ app.get('/artist_playlist', (req, res) => {
                 headers: {Authorization: `Bearer ${access_token}`, 'Content-Type': 'application/json'}
             });
             
+            res.json({"message" : "success", "data" : []});
         }
         
         catch(err) {
-            res.status(500).send('Error in /artist_playlist: ' + err.message + ' **');
+            res.status(500).send('Error in /discover_artist: ' + err.message + ' **');
         }
 
 

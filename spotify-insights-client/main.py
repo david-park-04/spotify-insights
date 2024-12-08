@@ -169,7 +169,7 @@ def discover_artist(baseurl):
     """    
     
     try:
-        api = "/"
+        api = "/discover_artist"
         
         url = baseurl + api
         
@@ -188,7 +188,7 @@ def discover_artist(baseurl):
         
     except Exception as e:
         print("** ERROR **")
-        logging.error("func() failed:")
+        logging.error("discover_artist() failed:")
         logging.error("url: " + url)
         logging.error(e) 
         
