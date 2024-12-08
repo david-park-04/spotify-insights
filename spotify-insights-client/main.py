@@ -153,11 +153,11 @@ def favorite_artist(baseurl):
         logging.error(e)   
         
 # ----------
-# 
+# Discover Artist
 # ----------
-def func1(baseurl):
+def discover_artist(baseurl):
     """
-    Description.
+    Creates a playlist with the songs of an artist you may like. Discover their songs!
     
     Parameters
     ----------
@@ -181,6 +181,10 @@ def func1(baseurl):
             print("url: " + url)
             
             return
+        
+        # Success
+        print()
+        print("Playlist created! Check your Spotify!\n")
         
     except Exception as e:
         print("** ERROR **")
@@ -240,7 +244,7 @@ def prompt():
         print("   0 => end")
         print("   1 => calculate genres of top tracks")
         print("   2 => calculate favorite artist (based on frequency in top tracks)")
-        print("   3 => command 3")
+        print("   3 => create a playlist with songs of an artist you may like")
         
         cmd = int(input())
         
@@ -284,7 +288,7 @@ while cmd != 0:
     elif cmd == 2:
         favorite_artist(baseurl)
     elif cmd == 3:
-        pass
+        discover_artist(baseurl)
     else:
         print("** Unknown command, try again... **")
   
